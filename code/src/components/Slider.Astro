@@ -1,0 +1,62 @@
+---
+import Photo from "./base/Photo.astro"
+---
+
+<!-- Galería de Imágenes Dinámica -->
+<section class="bg-white p-8 rounded-md shadow-lg">
+  <h3 class="text-2xl font-bold text-green-800 mb-6">¡EL REY DEL BOLO!</h3>
+  <div class="relative overflow-hidden rounded-md shadow-lg">
+    <div class="slider flex transition-transform duration-500 ease-in-out">
+      <img src="/src/assets/img1.webp" alt="El rey del bolo" class="w-auto h-auto object-cover mx-auto" />
+      <img src="/src/assets/nosotrossucre.webp" alt="El rey del bolo sucre" class="w-auto h-auto object-cover mx-auto" />
+      <img src="/src/assets/nosotrosvillamontes.webp" alt="El rey del bolo villamontes" class="w-auto h-auto object-cover mx-auto" />
+      <img src="/src/assets/nosotrosyacuiba.webp" alt="El rey del bolo yacuiba" class="w-auto h-auto object-cover mx-auto" />
+    </div>
+  </div>
+  <div class="flex justify-center mt-4 space-x-2">
+    <button class="w-3 h-3 bg-green-700 rounded-full"></button>
+    <button class="w-3 h-3 bg-green-500 rounded-full"></button>
+    <button class="w-3 h-3 bg-green-500 rounded-full"></button>
+  </div>
+</section>
+
+<script type="module">
+// Galería de imágenes dinámica
+    let currentIndex = 0;
+    const slider = document.querySelector(".slider");
+    const slides = document.querySelectorAll(".slider img");
+    const dots = document.querySelectorAll(".flex button");
+
+    if (slider) {
+      function showSlide(index) {
+        if (index < 0 || index >= slides.length) return;
+
+        currentIndex = index;
+        const offset = -index * 100;
+        slider.style.transform = `translateX(${offset}%)`;
+
+        // Actualizar el estado de los botones
+        dots.forEach((dot, i) => {
+          if (i === index) {
+            dot.classList.add("bg-green-700");
+            dot.classList.remove("bg-green-500");
+          } else {
+            dot.classList.add("bg-green-500");
+            dot.classList.remove("bg-green-700");
+          }
+        });
+      }
+
+      showSlide(currentIndex);
+
+      dots.forEach((dot, index) => {
+        dot.addEventListener("click", () => {
+          showSlide(index);
+        });
+      });
+
+      setInterval(() => {
+        showSlide((currentIndex + 1) % slides.length);
+      }, 3000);
+    }
+</script>

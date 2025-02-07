@@ -8,8 +8,7 @@ import Photo from "./base/Photo.astro"
   >
     <!-- Soporte al cliente - Solo visible en pantallas medianas y grandes -->
     <div class="hidden md:flex items-center gap-2">
-      <i class="fa-solid fa-headset text-2xl md:text-3xl"></i>
-      <div class="flex flex-col">
+      <svg width="36" height="36" viewBox="0 0 512 512"><path fill="#000000" d="M192 208c0-17.67-14.33-32-32-32h-16c-35.35 0-64 28.65-64 64v48c0 35.35 28.65 64 64 64h16c17.67 0 32-14.33 32-32zm176 144c35.35 0 64-28.65 64-64v-48c0-35.35-28.65-64-64-64h-16c-17.67 0-32 14.33-32 32v112c0 17.67 14.33 32 32 32zM256 0C113.18 0 4.58 118.83 0 256v16c0 8.84 7.16 16 16 16h16c8.84 0 16-7.16 16-16v-16c0-114.69 93.31-208 208-208s208 93.31 208 208h-.12c.08 2.43.12 165.72.12 165.72c0 23.35-18.93 42.28-42.28 42.28H320c0-26.51-21.49-48-48-48h-32c-26.51 0-48 21.49-48 48s21.49 48 48 48h181.72c49.86 0 90.28-40.42 90.28-90.28V256C507.42 118.83 398.82 0 256 0"/></svg>      <div class="flex flex-col">
         <span class="text-xs md:text-sm text-gray-900">Soporte al cliente</span>
         <span class="text-xs md:text-sm text-gray-900">64325119</span>
       </div>
@@ -73,11 +72,8 @@ import Photo from "./base/Photo.astro"
           placeholder="Buscar.."
           class="pl-6 text-left rounded-l-3xl py-1 w-full"
         />
-        <button
-          class="bg-green-800 text-white p-1 rounded-r-3xl hover:bg-green-500"
-        >
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
+        <button class="bg-green-800 text-white p-1 rounded-r-3xl hover:bg-green-500">
+          <svg width="25" height="24" viewBox="0 0 24 24"><path fill="#ffffff" d="m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"/></svg>      </button>
       </form>
     </div>
   </nav>
@@ -148,39 +144,65 @@ import Photo from "./base/Photo.astro"
     console.log("Item added to cart:", { id, description, imageUrl, price, quantity: 1 }); // Solo para verificación
   }
 
-  // Función para mostrar los elementos del carrito en el contenedor
   function displayCartItems() {
     const cartItemsString = localStorage.getItem("cart");
-    // Asegúrate de que cartItemsString no sea null antes de parsear
     const cartItems: CartItem[] = cartItemsString ? JSON.parse(cartItemsString) : [];
     const cartContainer = document.getElementById('cartItems');
+    const cartTotalElement = document.getElementById('cartTotal');
 
-    // Verifica que cartContainer no sea null antes de manipularlo
+    let total = 0;
+    let message = "Hola, quiero comprar los siguientes productos:\n\n";
+
     if (cartContainer) {
-      // Limpiar el contenedor antes de agregar nuevos elementos
-      cartContainer.innerHTML = '';
+        cartContainer.innerHTML = '';
 
-      // Agregar cada item del carrito al contenedor
-      cartItems.forEach((item: CartItem) => {
-        const itemElement = document.createElement('div');
-        itemElement.classList.add('flex', 'items-center', 'mt-5', 'first:mt-0');
+        cartItems.forEach((item: CartItem) => {
+            const itemElement = document.createElement('div');
+            itemElement.classList.add('flex', 'items-center', 'mt-5', 'first:mt-0');
 
-        itemElement.innerHTML = `
-          <div class="w-20 h-auto">
-            <img 
-      src='../img/p_Chicle.png'      
-alt="${item.description}">
-          </div>
-          <div class="w-[calc(100%-80px)] pl-5">
-            <p>${item.description}</p>
-            <p>Cantidad: ${item.quantity}</p>
-            <p class="mt-1 text-green-800 font-bold">${item.price} Bs.</p>
-          </div>
-        `;
-        cartContainer.appendChild(itemElement);
-      });
+            itemElement.innerHTML = `
+                <div class="w-20 h-auto">
+                    <img src='../img/p_Chicle.png' alt="${item.description}">
+                </div> 
+                <div class="w-[calc(100%-80px)] pl-5">
+                    <p>${item.description}</p>
+                    <p>Cantidad: ${item.quantity}</p>
+                    <p class="mt-1 text-green-800 font-bold">${item.price} Bs.</p>
+                </div>
+            `;
+
+            cartContainer.appendChild(itemElement);
+
+            // Sumar al total
+            total += item.price * item.quantity;
+            // Agregar al mensaje de WhatsApp
+            message += `${item.quantity} ${item.description}, a ${item.price} Bs.\n`;
+        });
+
+        message += `\nPor un total de: ${total.toFixed(2)} Bs.`;
     }
-  }
+
+    // Generar enlace de WhatsApp
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappLink = `https://api.whatsapp.com/send/?phone=59164325119&text=${encodedMessage}%2E&type=phone_number&app_absent=0`;
+
+    // Actualizar el total en el DOM junto con los botones
+    if (cartTotalElement) {
+        cartTotalElement.innerHTML = `
+            <h4 class="text-lg text-green-800">Total: <strong class="text-green-800">${total.toFixed(2)} Bs.</strong> </h4>
+            <div class="pt-8 border-t border-gray-500 space-y-4">
+          <a
+            href=""
+            class="btn-border w-full h-12 flex items-center justify-center rounded-full text-sm font-semibold uppercase border-2 border-gray-500 text-gray-500"
+            >Ir al carrito</a
+          >
+          <a id="whatsapp-button" href="${whatsappLink}" target="_blank" class="btn-primary w-full h-12 flex items-center justify-center rounded-full text-sm font-semibold uppercase bg-blue-600 text-white">
+                    Comprar Ahora
+                </a>
+        </div>
+        `;
+    }
+}
 
   document.addEventListener('DOMContentLoaded', () => {
     // Llamar a la función para mostrar los elementos del carrito al cargar la página
